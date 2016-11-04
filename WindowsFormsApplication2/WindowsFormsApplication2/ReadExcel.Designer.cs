@@ -35,6 +35,9 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.ConvXMLbtn2 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -51,7 +54,7 @@
             // 
             // CloseBtn
             // 
-            this.CloseBtn.Location = new System.Drawing.Point(12, 182);
+            this.CloseBtn.Location = new System.Drawing.Point(12, 239);
             this.CloseBtn.Name = "CloseBtn";
             this.CloseBtn.Size = new System.Drawing.Size(242, 53);
             this.CloseBtn.TabIndex = 1;
@@ -66,10 +69,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(12, 241);
+            this.dataGridView2.Location = new System.Drawing.Point(12, 298);
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowTemplate.Height = 33;
-            this.dataGridView2.Size = new System.Drawing.Size(1140, 429);
+            this.dataGridView2.Size = new System.Drawing.Size(1153, 273);
             this.dataGridView2.TabIndex = 2;
             // 
             // ConvXMLbtn
@@ -107,15 +110,47 @@
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 33;
-            this.dataGridView1.Size = new System.Drawing.Size(116, 21);
+            this.dataGridView1.Size = new System.Drawing.Size(129, 0);
             this.dataGridView1.TabIndex = 5;
             this.dataGridView1.Visible = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label1.Location = new System.Drawing.Point(12, 128);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(447, 37);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Enter # of entries per XML file:";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.textBox1.Location = new System.Drawing.Point(465, 125);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(152, 44);
+            this.textBox1.TabIndex = 7;
+            this.textBox1.Text = "500";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(694, 108);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(335, 59);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Open Directory";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // ReadExcel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1164, 682);
+            this.ClientSize = new System.Drawing.Size(1177, 583);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.ConvXMLbtn2);
             this.Controls.Add(this.ConvXMLbtn);
             this.Controls.Add(this.CloseBtn);
@@ -127,6 +162,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -139,6 +175,9 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Button ConvXMLbtn2;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button button1;
     }
 }
 

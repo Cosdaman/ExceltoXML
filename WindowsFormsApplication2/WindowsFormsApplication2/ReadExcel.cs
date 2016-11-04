@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
 using System.Xml;
 
 namespace WindowsFormsApplication2
@@ -17,13 +11,15 @@ namespace WindowsFormsApplication2
     public partial class ReadExcel : Form
     {
 
-        string filePath = string.Empty;
+        string excelFilePath = string.Empty;
         string fileExt = string.Empty;
         string con;
         OleDbConnection conn;
         OleDbCommand oconn;
         OleDbDataAdapter sda;
         DataTable data;
+        int numEntries;
+        string filePath = string.Empty;
 
         public ReadExcel()
         {
@@ -33,18 +29,18 @@ namespace WindowsFormsApplication2
         private void ChooseFileBtn_Click(object sender, EventArgs e)
         {
             OpenFileDialog file = new OpenFileDialog();
-            if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (file.ShowDialog() == DialogResult.OK)
             {
-                filePath = file.FileName;
-                fileExt = Path.GetExtension(filePath);
+                excelFilePath = file.FileName;
+                fileExt = Path.GetExtension(excelFilePath);
                 if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
                 {
                     try
                     {
                         if (fileExt.CompareTo(".xls") == 0)
-                            con = @"provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + filePath + ";Extended Properties='Excel 8.0;HRD=Yes;IMEX=1';"; //for below excel 2007  
+                            con = @"provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + excelFilePath + ";Extended Properties='Excel 8.0;HRD=Yes;IMEX=1';"; //for below excel 2007  
                         else
-                            con = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";Extended Properties='Excel 12.0;HDR=Yes;IMEX=1';"; //for above excel 2007  
+                            con = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + excelFilePath + ";Extended Properties='Excel 12.0;HDR=Yes;IMEX=1';"; //for above excel 2007  
 
                         conn = new OleDbConnection(con);
                         oconn = new OleDbCommand("SELECT * FROM [Sheet1$]", conn);
@@ -68,11 +64,14 @@ namespace WindowsFormsApplication2
 
         private void CloseBtn_Click(object sender, EventArgs e)
         {
-            this.Close(); //to close the window(Form1)
+            this.Close();
         }
 
         private void ConvXMLbtn_Click(object sender, EventArgs e)
         {
+            
+            Int32.TryParse(textBox1.Text, out numEntries);
+
             if (dataGridView2.Rows.Count == 0)
             {
                 MessageBox.Show("Please load an Excel file before attempting to convert to XML.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -90,7 +89,8 @@ namespace WindowsFormsApplication2
         private void saveFileDialog1_FileOk()
         {
             string name = saveFileDialog1.FileName;
-
+            string nameNoExt = Path.GetFileNameWithoutExtension(name);
+            filePath = Path.GetDirectoryName(name);
             string[,] tempDataTable = new string[dataGridView2.Rows.Count, 8];
             int rowNumber = 0;
 
@@ -106,33 +106,57 @@ namespace WindowsFormsApplication2
                 tempDataTable[rowNumber, 7] = row.Cells["MulDiv"].Value.ToString();
                 rowNumber++;
             }
-            using (XmlWriter writer = XmlWriter.Create(name))
+            float numFiles = (tempDataTable.GetLength(0) / numEntries);
+            int counter; 
+            int rows = tempDataTable.GetLength(0);
+
+            for (int x = 0; x < numFiles+1; x++)
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("SetupInvMaster");
-                for (int i = 0; i < tempDataTable.GetLength(0); i++)
+               
+                if (!Directory.Exists(filePath + "/" + nameNoExt + "/"))
                 {
-                    writer.WriteStartElement("Item");
-                    writer.WriteStartElement("Key");
-                    writer.WriteElementString("StockCode", tempDataTable[i,0]);
-                    writer.WriteEndElement();
-                    writer.WriteElementString("StockUom", tempDataTable[i, 1]);
-                    writer.WriteElementString("AlternateUom", tempDataTable[i, 2]);
-                    writer.WriteElementString("OtherUom", tempDataTable[i, 3]);
-                    writer.WriteElementString("ConvFactAltUom", tempDataTable[i, 4]);
-                    writer.WriteElementString("ConvMulDiv", tempDataTable[i, 5]);
-                    writer.WriteElementString("ConvFactOthUom", tempDataTable[i, 6]);
-                    writer.WriteElementString("MulDiv", tempDataTable[i, 7]);
-                    writer.WriteEndElement();
+                    Directory.CreateDirectory(filePath + "/" + nameNoExt + "/");
                 }
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-                MessageBox.Show("Generation of XML file has finished.","Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                using (XmlWriter writer = XmlWriter.Create(filePath + "/" + nameNoExt +  "/" + nameNoExt + (x + 1) + ".xml"))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("SetupInvMaster");
+                    for (int i = 0; i < numEntries; i++)
+                    {
+                        counter = i + x * numEntries;
+
+                        
+                        writer.WriteStartElement("Item");
+                        writer.WriteStartElement("Key");
+                        writer.WriteElementString("StockCode", tempDataTable[counter, 0]);
+                        writer.WriteEndElement();
+                        writer.WriteElementString("StockUom", tempDataTable[counter, 1]);
+                        writer.WriteElementString("AlternateUom", tempDataTable[counter, 2]);
+                        writer.WriteElementString("OtherUom", tempDataTable[counter, 3]);
+                        writer.WriteElementString("ConvFactAltUom", tempDataTable[counter, 4]);
+                        writer.WriteElementString("ConvMulDiv", tempDataTable[counter, 5]);
+                        writer.WriteElementString("ConvFactOthUom", tempDataTable[counter, 6]);
+                        writer.WriteElementString("MulDiv", tempDataTable[counter, 7]);
+                        writer.WriteEndElement();
+
+                        if (counter+2 > rows)
+                        {
+                            i = numEntries + 10;
+                        }
+
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
             }
+            MessageBox.Show("Generation of XML files finished.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ConvXMLbtn2_Click(object sender, EventArgs e)
         {
+            Int32.TryParse(textBox1.Text, out numEntries);
+
             if (dataGridView2.Rows.Count == 0)
             {
                 MessageBox.Show("Please load an Excel file before attempting to convert to XML.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -150,6 +174,8 @@ namespace WindowsFormsApplication2
         private void saveFileDialog2_FileOk()
         {
             string name = saveFileDialog1.FileName;
+            string nameNoExt = Path.GetFileNameWithoutExtension(name);
+            filePath = Path.GetDirectoryName(name);
 
             conn = new OleDbConnection(con);
             oconn = new OleDbCommand("SELECT * FROM [Sheet1$] WHERE cost<>0", conn);
@@ -164,30 +190,62 @@ namespace WindowsFormsApplication2
 
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                    tempDataTable[rowNumber, 0] = row.Cells["Warehouse"].Value.ToString();
-                    tempDataTable[rowNumber, 1] = row.Cells["StockCode"].Value.ToString();
-                    tempDataTable[rowNumber, 2] = row.Cells["Cost"].Value.ToString();
-                    rowNumber++;
+                tempDataTable[rowNumber, 0] = row.Cells["Warehouse"].Value.ToString();
+                tempDataTable[rowNumber, 1] = row.Cells["StockCode"].Value.ToString();
+                tempDataTable[rowNumber, 2] = row.Cells["Cost"].Value.ToString();
+                rowNumber++;
             }
 
-            using (XmlWriter writer = XmlWriter.Create(name))
+            float numFiles = (tempDataTable.GetLength(0) / numEntries);
+            int counter;
+            int rows = tempDataTable.GetLength(0);
+
+            for (int x = 0; x < numFiles + 1; x++)
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("PostInvCostChange");
-                for (int i = 0; i < tempDataTable.GetLength(0); i++)
+                if (!Directory.Exists(filePath + "/" + nameNoExt + "/"))
                 {
-                    writer.WriteStartElement("Item");
-                    writer.WriteElementString("Warehouse", tempDataTable[i, 0]);
-                    writer.WriteElementString("StockCode", tempDataTable[i, 1]);
-                    writer.WriteElementString("NewUnitCost", tempDataTable[i, 2]);
-                    writer.WriteElementString("UpdateLastCost", "Y");
-                    writer.WriteElementString("Reference", "UOM CHG");
-                    writer.WriteElementString("Notation", "Cost change Note");
-                    writer.WriteEndElement();
+                    Directory.CreateDirectory(filePath + "/" + nameNoExt + "/");
                 }
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-                MessageBox.Show("Generation of XML file has finished.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                using (XmlWriter writer = XmlWriter.Create(filePath + "/" + nameNoExt + "/" + nameNoExt + (x + 1) + ".xml"))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("PostInvCostChange");
+                    for (int i = 0; i < numEntries; i++)
+                    {
+                        counter = i + x * numEntries;
+
+                        writer.WriteStartElement("Item");
+                        writer.WriteElementString("Warehouse", tempDataTable[i, 0]);
+                        writer.WriteElementString("StockCode", tempDataTable[i, 1]);
+                        writer.WriteElementString("NewUnitCost", tempDataTable[i, 2]);
+                        writer.WriteElementString("UpdateLastCost", "Y");
+                        writer.WriteElementString("Reference", "UOM CHG");
+                        writer.WriteElementString("Notation", "Cost change Note");
+                        writer.WriteEndElement();
+
+                        if (counter + 2 > rows)
+                        {
+                            i = numEntries + 10;
+                        }
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+            }
+            MessageBox.Show("Generation of XML file has finished.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (filePath != string.Empty)
+            {
+                Process.Start("explorer.exe", @filePath);
+            }
+            else
+            {
+                MessageBox.Show("Please convert an XML file before attempting to open the directory.", "Error.", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
