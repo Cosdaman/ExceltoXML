@@ -195,12 +195,12 @@ namespace WindowsFormsApplication2
             sda = new OleDbDataAdapter(oconn);
             data = new DataTable();
             sda.Fill(data);
-            dataGridView1.DataSource = data;
+            dataGridView2.DataSource = data;
 
-            string[,] tempDataTable = new string[dataGridView1.Rows.Count, 3];
+            string[,] tempDataTable = new string[dataGridView2.Rows.Count, 3];
             int rowNumber = 0;
 
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            foreach (DataGridViewRow row in dataGridView2.Rows)
             {
                 tempDataTable[rowNumber, 0] = row.Cells["WHSE"].Value.ToString();
                 tempDataTable[rowNumber, 1] = row.Cells["*StockCode"].Value.ToString();
@@ -245,7 +245,6 @@ namespace WindowsFormsApplication2
                     writer.WriteEndDocument();
                 }
             }
-            dataGridView1 = null;
             tempDataTable = null;
             MessageBox.Show("Generation of XML file has finished.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -262,6 +261,7 @@ namespace WindowsFormsApplication2
                 MessageBox.Show("Please convert an XML file before attempting to open the directory.", "Error.", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        
     }
 }
 
