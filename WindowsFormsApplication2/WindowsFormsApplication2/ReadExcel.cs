@@ -225,18 +225,18 @@ namespace WindowsFormsApplication2
                 checker = row.Cells[109].Value.ToString();
                 //if (!string.IsNullOrEmpty(checker))
                 decimal.TryParse(checker, out result);
+                MessageBox.Show(checker);
 
-                if (!string.IsNullOrEmpty(checker) && result>0)
+                if (!string.IsNullOrEmpty(checker))
                 {
                         tempDataTable[rowNumber, 0] = row.Cells[3].Value.ToString();
                         tempDataTable[rowNumber, 1] = row.Cells[1].Value.ToString();
                         tempDataTable[rowNumber, 2] = row.Cells[109].Value.ToString();
-
                         rowNumber++;
                 }
             }
 
-            float numFiles = (tempDataTable.GetLength(0) / numEntries);
+            float numFiles = (rowNumber / numEntries);
             int counter;
             int rows = tempDataTable.GetLength(0);
 
