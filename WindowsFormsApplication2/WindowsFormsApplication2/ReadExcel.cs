@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -17,9 +18,11 @@ namespace WindowsFormsApplication2
         OleDbConnection conn;
         OleDbCommand oconn;
         OleDbDataAdapter sda;
-        DataTable data;
         int numEntries;
         string filePath = string.Empty;
+        String worksheetName;
+        Decimal result;
+
 
         public ReadExcel()
         {
@@ -33,6 +36,7 @@ namespace WindowsFormsApplication2
             {
                 excelFilePath = file.FileName;
                 fileExt = Path.GetExtension(excelFilePath);
+                Cursor = Cursors.WaitCursor;
                 if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
                 {
                     try
@@ -42,13 +46,23 @@ namespace WindowsFormsApplication2
                         else
                             con = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + excelFilePath + ";Extended Properties='Excel 12.0;HDR=Yes;IMEX=1';"; //for above excel 2007  
 
+                        Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+                        Microsoft.Office.Interop.Excel.Workbook workbook = app.Workbooks.Open(excelFilePath);
+                        Microsoft.Office.Interop.Excel.Worksheet worksheet = workbook.Worksheets[1] as Microsoft.Office.Interop.Excel.Worksheet;
+                        worksheetName = worksheet.Name;
+                        workbook.Close(0);
+                        app.Quit();
+                        String command = "SELECT * FROM [" + worksheetName + "$]";
                         conn = new OleDbConnection(con);
-                        oconn = new OleDbCommand("SELECT * FROM [Sheet1$]", conn);
+                        oconn = new OleDbCommand(command, conn);
                         conn.Open();
                         sda = new OleDbDataAdapter(oconn);
                         DataTable data = new DataTable();
                         sda.Fill(data);
+                        DataRow row = data.Rows[0];
+                        data.Rows.Remove(row);
                         dataGridView2.DataSource = data;
+                        Cursor = Cursors.Default;
                     }
                     catch (Exception ex)
                     {
@@ -93,19 +107,21 @@ namespace WindowsFormsApplication2
             filePath = Path.GetDirectoryName(name);
             string[,] tempDataTable = new string[dataGridView2.Rows.Count, 8];
             int rowNumber = 0;
+            
 
             foreach (DataGridViewRow row in dataGridView2.Rows)
             {
-                tempDataTable[rowNumber, 0] = row.Cells["StockCode"].Value.ToString();
-                tempDataTable[rowNumber, 1] = row.Cells["StockUom"].Value.ToString();
-                tempDataTable[rowNumber, 2] = row.Cells["AlternateUom"].Value.ToString();
-                tempDataTable[rowNumber, 3] = row.Cells["OtherUom"].Value.ToString();
-                tempDataTable[rowNumber, 4] = row.Cells["ConvFactAltUom"].Value.ToString();
-                tempDataTable[rowNumber, 5] = row.Cells["ConvMulDiv"].Value.ToString();
-                tempDataTable[rowNumber, 6] = row.Cells["ConvFactOthUom"].Value.ToString();
-                tempDataTable[rowNumber, 7] = row.Cells["MulDiv"].Value.ToString();
+                tempDataTable[rowNumber, 0] = row.Cells[1].Value.ToString();
+                tempDataTable[rowNumber, 1] = row.Cells[7].Value.ToString();
+                tempDataTable[rowNumber, 2] = row.Cells[8].Value.ToString();
+                tempDataTable[rowNumber, 3] = row.Cells[9].Value.ToString();
+                tempDataTable[rowNumber, 4] = row.Cells[10].Value.ToString();
+                tempDataTable[rowNumber, 5] = row.Cells[11].Value.ToString();
+                tempDataTable[rowNumber, 6] = row.Cells[12].Value.ToString();
+                tempDataTable[rowNumber, 7] = row.Cells[13].Value.ToString();
                 rowNumber++;
             }
+
             float numFiles = (tempDataTable.GetLength(0) / numEntries);
             int counter; 
             int rows = tempDataTable.GetLength(0);
@@ -126,19 +142,25 @@ namespace WindowsFormsApplication2
                     {
                         counter = i + x * numEntries;
 
-                        
-                        writer.WriteStartElement("Item");
-                        writer.WriteStartElement("Key");
-                        writer.WriteElementString("StockCode", tempDataTable[counter, 0]);
-                        writer.WriteEndElement();
-                        writer.WriteElementString("StockUom", tempDataTable[counter, 1]);
-                        writer.WriteElementString("AlternateUom", tempDataTable[counter, 2]);
-                        writer.WriteElementString("OtherUom", tempDataTable[counter, 3]);
-                        writer.WriteElementString("ConvFactAltUom", tempDataTable[counter, 4]);
-                        writer.WriteElementString("ConvMulDiv", tempDataTable[counter, 5]);
-                        writer.WriteElementString("ConvFactOthUom", tempDataTable[counter, 6]);
-                        writer.WriteElementString("MulDiv", tempDataTable[counter, 7]);
-                        writer.WriteEndElement();
+                        if (tempDataTable[counter, 1].Equals("StockUom"))
+                        {
+
+                        }
+                        else
+                        {
+                            writer.WriteStartElement("Item");
+                            writer.WriteStartElement("Key");
+                            writer.WriteElementString("StockCode", tempDataTable[counter, 0]);
+                            writer.WriteEndElement();
+                            writer.WriteElementString("StockUom", tempDataTable[counter, 1]);
+                            writer.WriteElementString("AlternateUom", tempDataTable[counter, 2]);
+                            writer.WriteElementString("OtherUom", tempDataTable[counter, 3]);
+                            writer.WriteElementString("ConvFactAltUom", tempDataTable[counter, 4]);
+                            writer.WriteElementString("ConvMulDiv", tempDataTable[counter, 5]);
+                            writer.WriteElementString("ConvFactOthUom", tempDataTable[counter, 6]);
+                            writer.WriteElementString("MulDiv", tempDataTable[counter, 7]);
+                            writer.WriteEndElement();
+                        }
 
                         if (counter+2 > rows)
                         {
@@ -173,27 +195,45 @@ namespace WindowsFormsApplication2
 
         private void saveFileDialog2_FileOk()
         {
+            Cursor = Cursors.WaitCursor;
             string name = saveFileDialog1.FileName;
             string nameNoExt = Path.GetFileNameWithoutExtension(name);
             filePath = Path.GetDirectoryName(name);
+            //conn = new OleDbConnection(con);
+            //Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
+            //Microsoft.Office.Interop.Excel.Workbook workbook = app.Workbooks.Open(excelFilePath);
+            //Microsoft.Office.Interop.Excel.Worksheet worksheet = workbook.Worksheets[1] as Microsoft.Office.Interop.Excel.Worksheet;
+            //String columnName = worksheet.Columns[110].Address;
+            //columnName = columnName.Substring(1,2);
+            //String command = "SELECT * FROM [" + worksheetName + "$]";
+            //conn = new OleDbConnection(con);
+            //oconn = new OleDbCommand(command, conn);
+            //conn.Open();
+            //sda = new OleDbDataAdapter(oconn);
+            //workbook.Close(0);
+            //app.Quit();
+            //DataTable data = new DataTable();
+            //sda.Fill(data);
+            //dataGridView2.DataSource = data;
 
-            conn = new OleDbConnection(con);
-            oconn = new OleDbCommand("SELECT * FROM [Sheet1$] WHERE cost<>0", conn);
-            conn.Open();
-            sda = new OleDbDataAdapter(oconn);
-            data = new DataTable();
-            sda.Fill(data);
-            dataGridView1.DataSource = data;
-
-            string[,] tempDataTable = new string[dataGridView1.Rows.Count, 3];
+            string[,] tempDataTable = new string[dataGridView2.Rows.Count, 3];
             int rowNumber = 0;
+            string checker;
 
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            foreach (DataGridViewRow row in dataGridView2.Rows)
             {
-                tempDataTable[rowNumber, 0] = row.Cells["Warehouse"].Value.ToString();
-                tempDataTable[rowNumber, 1] = row.Cells["StockCode"].Value.ToString();
-                tempDataTable[rowNumber, 2] = row.Cells["Cost"].Value.ToString();
-                rowNumber++;
+                checker = row.Cells[109].Value.ToString();
+                //if (!string.IsNullOrEmpty(checker))
+                decimal.TryParse(checker, out result);
+
+                if (!string.IsNullOrEmpty(checker) && result>0)
+                {
+                        tempDataTable[rowNumber, 0] = row.Cells[3].Value.ToString();
+                        tempDataTable[rowNumber, 1] = row.Cells[1].Value.ToString();
+                        tempDataTable[rowNumber, 2] = row.Cells[109].Value.ToString();
+
+                        rowNumber++;
+                }
             }
 
             float numFiles = (tempDataTable.GetLength(0) / numEntries);
@@ -233,6 +273,7 @@ namespace WindowsFormsApplication2
                     writer.WriteEndDocument();
                 }
             }
+            Cursor = Cursors.Default;
             MessageBox.Show("Generation of XML file has finished.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
