@@ -8,13 +8,3 @@ C:\Users\Cosda\Documents\Visual Studio 2015\Projects\WindowsFormsApplication2\Wi
 C:\Users\Cosda\Documents\Visual Studio 2015\Projects\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.exe
 C:\Users\Cosda\Documents\Visual Studio 2015\Projects\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.pdb
 C:\Users\Cosda\Documents\Visual Studio 2015\Projects\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\ReadExcel.csprojResolveAssemblyReference.cache
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\bin\Debug\WindowsFormsApplication2.exe.config
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\ReadExcel.csproj.ResolveComReference.cache
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.exe
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.pdb
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\bin\Debug\WindowsFormsApplication2.exe
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\bin\Debug\WindowsFormsApplication2.pdb
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\ReadExcel.csprojResolveAssemblyReference.cache
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.ReadExcel.resources
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\WindowsFormsApplication2.Properties.Resources.resources
-C:\Users\Cosda\Documents\GitHub\ExceltoXML\WindowsFormsApplication2\WindowsFormsApplication2\obj\Debug\ReadExcel.csproj.GenerateResource.Cache
